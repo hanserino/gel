@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch #7</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center content horizontally */
+            background-color: #f9f9f9; /* Light background for better contrast */
+        }
+        h1, h2 {
+            text-align: center; /* Center align headings */
+            margin-bottom: 20px; /* Space below headings */
+            color: #333; /* Darker text for better readability */
+        }
+        form {
+            width: 100%; /* Make form full width */
+            max-width: 400px; /* Set a max width for forms */
+        }
+        label {
+            display: block; /* Make labels block elements */
+            margin-bottom: 5px; /* Space between label and input */
+            color: #555; /* Slightly darker color for labels */
+        }
+        input, button {
+            margin: 10px 0; /* Increased margin for better spacing */
+            padding: 12px; /* Increased padding for better touch targets */
+            width: 100%; /* Make inputs and buttons full width */
+            box-sizing: border-box; /* Include padding in width */
+            border: 1px solid #ccc; /* Add a border to inputs */
+            border-radius: 4px; /* Rounded corners for inputs */
+            font-size: 16px; /* Increase font size for better readability */
+        }
+        button {
+            background-color: #4CAF50; /* Green background */
+            color: white; /* White text */
+            border: none; /* No border */
+            cursor: pointer; /* Pointer cursor on hover */
+            transition: background-color 0.3s; /* Smooth transition for hover effect */
+        }
+        button:hover {
+            background-color: #45a049; /* Darker green on hover */
+        }
+        p {
+            text-align: center; /* Center align paragraph text */
+            max-width: 600px; /* Set a max width for paragraphs */
+            margin: 0 20px 20px; /* Margin for paragraphs */
+            color: #555; /* Slightly lighter text for paragraphs */
+        }
+        /* Responsive iframe */
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 560px; /* Max width for the video */
+            height: 0;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            margin: 20px 0; /* Margin for spacing */
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0; /* Remove border */
+        }
+        
+    </style>
+</head>
+<body>
+    <h1>Batch #7</h1>
+    <p>A calculator based on the recipe Jon Albon used when he won CCC in 2023.</p>
+
+    <!-- First Calculator: Total Carbohydrates -->
+    <h2>Batch-størrelse</h2>
+    <form id="carbohydrateForm">
+        <label for="totalCarbs">Total grams of carbohydrates:</label>
+        <input type="number" id="totalCarbs" required>
+        <button type="submit">Calculate</button>
+    </form>
+    <div id="result1"></div>
+
+    <!-- Second Calculator: Number of Gels -->
+    <h2>Mengdekalkulator</h2>
+    <form id="gelForm">
+        <label for="numberOfGels">Antall gels du vil lage:</label>
+        <input type="number" id="numberOfGels" required>
+        <label for="carbsPerGel">Gram karbohydrater per gel:</label>
+        <input type="number" id="carbsPerGel" required>
+        <button type="submit">Kalkuler</button>
+    </form>
+    <div id="result2"></div>
+
+    <!-- New Calculator: Weight of Gel -->
+    <h2>Kalkuler mengde karbohydrater fra vekten på gelen</h2>
+    <form id="weightForm">
+        <label for="gelWeight">Vekten til gelen (i gram):</label>
+        <input type="number" id="gelWeight" required>
+        <button type="submit">Kalkuler</button>
+    </form>
+    <div id="result3"></div>
+
+    <script>
+        // JavaScript for Calculator 1
+        document.getElementById('carbohydrateForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const totalCarbs = parseFloat(document.getElementById('totalCarbs').value);
+            const glucose = (totalCarbs * 0.5556).toFixed(2);
+            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const pectin = (totalCarbs * 0.005).toFixed(2);
+            const water = (totalCarbs * 0.37 + 35).toFixed(2);
+            document.getElementById('result1').innerHTML = `
+                Glucose: ${glucose}g<br>
+                Fructose: ${fructose}g<br>
+                Pectin: ${pectin}g<br>
+                Water: ${water}g (including evaporation compensation)
+            `;
+        });
+
+        // JavaScript for Calculator 2
+        document.getElementById('gelForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const numberOfGels = parseInt(document.getElementById('numberOfGels').value);
+            const carbsPerGel = parseFloat(document.getElementById('carbsPerGel').value);
+            const totalCarbs = numberOfGels * carbsPerGel;
+            const glucose = (totalCarbs * 0.5556).toFixed(2);
+            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const pectin = (totalCarbs * 0.005).toFixed(2);
+            const water = (totalCarbs * 0.37 + 35).toFixed(2);
+            document.getElementById('result2').innerHTML = `
+                Total Carbohydrates: ${totalCarbs}g<br>
+                Glucose: ${glucose}g<br>
+                Fructose: ${fructose}g<br>
+                Pectin: ${pectin}g<br>
+                Water: ${water}g (including evaporation compensation)
+            `;
+        });
+
+        // JavaScript for Weight of Gel Calculator
+        document.getElementById('weightForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const gelWeight = parseFloat(document.getElementById('gelWeight').value);
+            const carbsInGel = (gelWeight * 0.625).toFixed(2); // 62.5% of the gel weight is the base mix
+            document.getElementById('result3').innerHTML = `
+                Total Carbohydrates in the gel: ${carbsInGel}g
+            `;
+        });
+    </script>
+</body>
+</html>

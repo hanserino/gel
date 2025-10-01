@@ -13,21 +13,30 @@
             display: flex;
             flex-direction: column;
             align-items: center; /* Center content horizontally */
-            background-color: #f9f9f9; /* Light background for better contrast */
+            background-color: white; /* Light background for better contrast */
+            color: black;
+        }
+        main {
+            max-width: 450px;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            a {
+                color: #4CAF50;
+            }
         }
         h1, h2 {
             text-align: center; /* Center align headings */
             margin-bottom: 20px; /* Space below headings */
-            color: #333; /* Darker text for better readability */
         }
         form {
             width: 100%; /* Make form full width */
-            max-width: 400px; /* Set a max width for forms */
         }
         label {
             display: block; /* Make labels block elements */
             margin-bottom: 5px; /* Space between label and input */
-            color: #555; /* Slightly darker color for labels */
+            color: black; /* Slightly darker color for labels */
         }
         input, button {
             margin: 10px 0; /* Increased margin for better spacing */
@@ -40,19 +49,19 @@
         }
         button {
             background-color: #4CAF50; /* Green background */
-            color: white; /* White text */
             border: none; /* No border */
             cursor: pointer; /* Pointer cursor on hover */
+            color: white;
             transition: background-color 0.3s; /* Smooth transition for hover effect */
         }
         button:hover {
             background-color: #45a049; /* Darker green on hover */
+            color: white;
         }
         p {
             text-align: center; /* Center align paragraph text */
             max-width: 600px; /* Set a max width for paragraphs */
             margin: 0 20px 20px; /* Margin for paragraphs */
-            color: #555; /* Slightly lighter text for paragraphs */
         }
         /* Responsive iframe */
         .video-container {
@@ -72,46 +81,104 @@
             border: 0; /* Remove border */
         }
         
+        /* Calculator details styling */
+        .calculator-details {
+            margin: 10px 0;
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .calculator-summary {
+            background-color: #f8f9fa;
+            padding: 15px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .calculator-content {
+            padding: 20px;
+        }
+        
     </style>
 </head>
 <body>
-    <h1>Batch #7</h1>
-    <p>A calculator based on the recipe Jon Albon used when he won CCC in 2023.</p>
+    <main id="main">
+    <header>
+        <h1>Batch #7</h1>
+        <p>Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of 2:1</p>
+        <a href="https://www.youtube.com/embed/C7yvQb9mkEw?si=9bBh_Ng-jdw2gFdk" target="_blank">Watch how Jon makes the gel here</a>.
 
+    </header>
     <!-- First Calculator: Total Carbohydrates -->
-    <h2>Batch size calculator</h2>
-    <form id="carbohydrateForm">
-        <label for="totalCarbs">Total grams of carbohydrates:</label>
-        <input type="number" id="totalCarbs" required>
-        <button type="submit">Calculate</button>
-    </form>
-    <div id="result1"></div>
+    <details class="calculator-details">
+        <summary class="calculator-summary">
+            Batch size calculator
+        </summary>
+        <div class="calculator-content">
+            <form id="carbohydrateForm">
+                <label for="totalCarbs">Total grams of carbohydrates in your batch:</label>
+                <input type="number" id="totalCarbs" required>
+                <button type="submit">Calculate</button>
+            </form>
+            <div id="result1"></div>
+        </div>
+    </details>
 
     <!-- Second Calculator: Number of Gels -->
-    <h2>Gel amount calculator</h2>
-    <form id="gelForm">
-        <label for="numberOfGels">Number of gels:</label>
-        <input type="number" id="numberOfGels" required>
-        <label for="carbsPerGel">Grams of carbohydrates per gel:</label>
-        <input type="number" id="carbsPerGel" required>
-        <button type="submit">Calculate</button>
-    </form>
-    <div id="result2"></div>
+    <details class="calculator-details">
+        <summary class="calculator-summary">
+            Gel amount calculator
+        </summary>
+        <div class="calculator-content">
+            <form id="gelForm">
+                <label for="numberOfGels">Number of gels you want to make:</label>
+                <input type="number" id="numberOfGels" required>
+                <label for="carbsPerGel">Grams of carbohydrates per gel:</label>
+                <input type="number" id="carbsPerGel" required>
+                <button type="submit">Calculate</button>
+            </form>
+            <div id="result2"></div>
+        </div>
+    </details>
 
     <!-- New Calculator: Weight of Gel -->
-    <h2>Calculate carb amount from gel weight</h2>
-    <p>If you made a batch and the container size varies and you need to know how many grams you have in each container</p>
-    <form id="weightForm">
-        <label for="gelWeight">Weight of the gel (in grams):</label>
-        <input type="number" id="gelWeight" required>
-        <button type="submit">Calculate</button>
-    </form>
-    <div id="result3"></div>
+    <details class="calculator-details">
+        <summary class="calculator-summary">
+            Calculate carb amount from gel weight
+        </summary>
+        <div class="calculator-content">
+            <p>If you made a batch and the container size varies and you need to know how many grams you have in each container</p>
+            <form id="weightForm">
+                <label for="gelWeight">Weight of the gel in grams:</label>
+                <input type="number" id="gelWeight" required>
+                <button type="submit">Calculate</button>
+            </form>
+            <div id="result3"></div>
+        </div>
+    </details>
 
-    <h2>How to make the gel</h2>
-    <div class="video-container">
-        <iframe src="https://www.youtube.com/embed/C7yvQb9mkEw?si=9bBh_Ng-jdw2gFdk" title="YouTube video player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    </div>
+    <!-- New Calculator: Race Duration -->
+    <details class="calculator-details">
+        <summary class="calculator-summary">
+            How much do I need to make?
+        </summary>
+        <div class="calculator-content">
+            <form id="raceForm">
+                <label for="raceHours">How many hours will you be racing or training?</label>
+                <input type="number" id="raceHours" step="0.5" required>
+                <label for="carbsPerHour">How many grams per hour can you take?</label>
+                <input type="number" id="carbsPerHour" required>
+                <button type="submit">Calculate</button>
+            </form>
+            <div id="result4"></div>
+        </div>
+    </details>
+
+    </main>
 
     <script>
         // JavaScript for Calculator 1
@@ -123,11 +190,17 @@
             const pectin = (totalCarbs * 0.005).toFixed(2);
             const water = (totalCarbs * 0.37 + 35).toFixed(2);
             document.getElementById('result1').innerHTML = `
-                Glucose: ${glucose}g<br>
-                Fructose: ${fructose}g<br>
-                Pectin: ${pectin}g<br>
-                Water: ${water}g (including evaporation compensation)
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">${totalCarbs}g gel ingredients:</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
+                    </ul>
+                </div>
             `;
+            document.getElementById('result1').scrollIntoView({ behavior: 'smooth' });
         });
 
         // JavaScript for Calculator 2
@@ -141,12 +214,17 @@
             const pectin = (totalCarbs * 0.005).toFixed(2);
             const water = (totalCarbs * 0.37 + 35).toFixed(2);
             document.getElementById('result2').innerHTML = `
-                Total Carbohydrates: ${totalCarbs}g<br>
-                Glucose: ${glucose}g<br>
-                Fructose: ${fructose}g<br>
-                Pectin: ${pectin}g<br>
-                Water: ${water}g (including evaporation compensation)
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">${numberOfGels} gels (${totalCarbs}g total) ingredients:</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
+                    </ul>
+                </div>
             `;
+            document.getElementById('result2').scrollIntoView({ behavior: 'smooth' });
         });
 
         // JavaScript for Weight of Gel Calculator
@@ -155,8 +233,48 @@
             const gelWeight = parseFloat(document.getElementById('gelWeight').value);
             const carbsInGel = (gelWeight * 0.625).toFixed(2); // 62.5% of the gel weight is the base mix
             document.getElementById('result3').innerHTML = `
-                Total Carbohydrates in the gel: ${carbsInGel}g
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">${gelWeight}g gel analysis:</h3>
+                    <div style="text-align: center; font-size: 18px;">
+                        <strong>Total Carbohydrates: ${carbsInGel}g</strong>
+                    </div>
+                </div>
             `;
+            document.getElementById('result3').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // JavaScript for Race Duration Calculator
+        document.getElementById('raceForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const raceHours = parseFloat(document.getElementById('raceHours').value);
+            const carbsPerHour = parseFloat(document.getElementById('carbsPerHour').value);
+            const totalCarbs = raceHours * carbsPerHour;
+            const glucose = (totalCarbs * 0.5556).toFixed(2);
+            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const pectin = (totalCarbs * 0.005).toFixed(2);
+            const water = (totalCarbs * 0.37 + 35).toFixed(2);
+            document.getElementById('result4').innerHTML = `
+                <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">${raceHours}h race (${totalCarbs}g total) ingredients:</h3>
+                    <ul style="list-style: none; padding: 0; margin: 0;">
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
+                    </ul>
+                </div>
+            `;
+            document.getElementById('result4').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Add scroll-to-top functionality for calculator summaries
+        document.querySelectorAll('.calculator-summary').forEach(function(summary) {
+            summary.addEventListener('click', function() {
+                // Small delay to allow the details to expand first
+                setTimeout(function() {
+                    summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 50);
+            });
         });
     </script>
 </body>
