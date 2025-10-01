@@ -6,7 +6,7 @@
     <title>Batch #7</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif, sans-serif;
             margin: 20px;
             padding: 0;
             box-sizing: border-box;
@@ -195,6 +195,15 @@
         .settings-form button[type="button"]:hover {
             background-color: #5a6268;
         }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+
+            img {
+                width: 50px;
+            }
+        }
         
     </style>
 </head>
@@ -293,12 +302,46 @@
         </div>
     </details>
 
+    <footer>
+        <p>Made by <a href="https://www.instagram.com/hanserino/" target="_blank">hanserino</a></p>
+        <img src="fokkasfalt.png" alt="Føkk Asfalt">
+    </footer>
+
     </main>
 
     <script>
         // Global variables for custom ratios
         let glucoseRatio = 0.5556;
         let fructoseRatio = 0.4444;
+        
+        // Load settings from localStorage on page load
+        function loadSettings() {
+            const savedGlucose = localStorage.getItem('gelGlucoseRatio');
+            const savedFructose = localStorage.getItem('gelFructoseRatio');
+            
+            if (savedGlucose && savedFructose) {
+                glucoseRatio = parseFloat(savedGlucose);
+                fructoseRatio = parseFloat(savedFructose);
+                
+                // Update the form inputs
+                const glucosePercent = glucoseRatio * 100;
+                document.getElementById('glucosePercent').value = glucosePercent.toFixed(2);
+                document.getElementById('fructoseDisplay').textContent = `Fructose: ${(fructoseRatio * 100).toFixed(2)}%`;
+                
+                // Update the header text
+                const ratioText = glucosePercent > (fructoseRatio * 100) ? 
+                    `${glucosePercent.toFixed(1)}:${(fructoseRatio * 100).toFixed(1)}` : 
+                    `${(fructoseRatio * 100).toFixed(1)}:${glucosePercent.toFixed(1)}`;
+                document.querySelector('header p').textContent = 
+                    `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of ${ratioText}`;
+            }
+        }
+        
+        // Save settings to localStorage
+        function saveSettings(glucose, fructose) {
+            localStorage.setItem('gelGlucoseRatio', glucose.toString());
+            localStorage.setItem('gelFructoseRatio', fructose.toString());
+        }
         
         // Settings modal functionality
         document.getElementById('settingsButton').addEventListener('click', function() {
@@ -332,6 +375,10 @@
             glucoseRatio = 0.5556;
             fructoseRatio = 0.4444;
             
+            // Clear localStorage to reset to defaults
+            localStorage.removeItem('gelGlucoseRatio');
+            localStorage.removeItem('gelFructoseRatio');
+            
             // Update the header text
             document.querySelector('header p').textContent = 
                 'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of 2:1';
@@ -352,6 +399,9 @@
             // Update global ratios
             glucoseRatio = glucosePercent / 100;
             fructoseRatio = fructosePercent / 100;
+            
+            // Save to localStorage
+            saveSettings(glucoseRatio, fructoseRatio);
             
             // Close modal
             document.getElementById('settingsModal').style.display = 'none';
@@ -458,6 +508,11 @@
                     summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 50);
             });
+        });
+        
+        // Initialize the page with saved settings
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
         });
     </script>
 </body>
