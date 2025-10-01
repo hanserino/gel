@@ -321,7 +321,7 @@
     <main id="main">
     <header>
         <h1>Batch #7</h1>
-        <p>Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of 2:1</p>
+        <p>Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>2:1</strong></p>
         <a href="https://www.youtube.com/embed/C7yvQb9mkEw?si=9bBh_Ng-jdw2gFdk" target="_blank">Watch how Jon makes the gel here</a>.
 
     </header>
@@ -417,11 +417,16 @@
                 document.getElementById('fructoseDisplay').textContent = `Fructose: ${(fructoseRatio * 100).toFixed(2)}%`;
                 
                 // Update the header text
-                const ratioText = glucosePercent > (fructoseRatio * 100) ? 
-                    `${glucosePercent.toFixed(1)}:${(fructoseRatio * 100).toFixed(1)}` : 
-                    `${(fructoseRatio * 100).toFixed(1)}:${glucosePercent.toFixed(1)}`;
-                document.querySelector('header p').textContent = 
-                    `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of ${ratioText}`;
+                let ratioText;
+                if (Math.abs(glucosePercent - 55.56) < 0.01 && Math.abs((fructoseRatio * 100) - 44.44) < 0.01) {
+                    ratioText = "2:1";
+                } else {
+                    ratioText = glucosePercent > (fructoseRatio * 100) ? 
+                        `${glucosePercent.toFixed(1)}:${(fructoseRatio * 100).toFixed(1)}` : 
+                        `${(fructoseRatio * 100).toFixed(1)}:${glucosePercent.toFixed(1)}`;
+                }
+                document.querySelector('header p').innerHTML = 
+                    `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>${ratioText}</strong>`;
             }
         }
         
@@ -516,8 +521,8 @@
             localStorage.removeItem('gelFructoseRatio');
             
             // Update the header text
-            document.querySelector('header p').textContent = 
-                'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of 2:1';
+            document.querySelector('header p').innerHTML = 
+                'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>2:1</strong>';
         });
         
         // Settings form submission
@@ -543,11 +548,16 @@
             document.getElementById('settingsModal').style.display = 'none';
             
             // Update the header text
-            const ratioText = glucosePercent > fructosePercent ? 
-                `${glucosePercent.toFixed(1)}:${fructosePercent.toFixed(1)}` : 
-                `${fructosePercent.toFixed(1)}:${glucosePercent.toFixed(1)}`;
-            document.querySelector('header p').textContent = 
-                `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of ${ratioText}`;
+            let ratioText;
+            if (Math.abs(glucosePercent - 55.56) < 0.01 && Math.abs(fructosePercent - 44.44) < 0.01) {
+                ratioText = "2:1";
+            } else {
+                ratioText = glucosePercent > fructosePercent ? 
+                    `${glucosePercent.toFixed(1)}:${fructosePercent.toFixed(1)}` : 
+                    `${fructosePercent.toFixed(1)}:${glucosePercent.toFixed(1)}`;
+            }
+            document.querySelector('header p').innerHTML = 
+                `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>${ratioText}</strong>`;
         });
         
         // JavaScript for Calculator 1
