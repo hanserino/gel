@@ -103,9 +103,124 @@
             padding: 20px;
         }
         
+        /* Settings button */
+        .settings-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        
+        .settings-button:hover {
+            background-color: transparent;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .settings-form {
+            margin-top: 20px;
+        }
+        
+        .settings-form label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .settings-form input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .settings-form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .settings-form button:hover {
+            background-color: #45a049;
+        }
+        
+        .settings-form button[type="button"] {
+            background-color: #6c757d;
+        }
+        
+        .settings-form button[type="button"]:hover {
+            background-color: #5a6268;
+        }
+        
     </style>
 </head>
 <body>
+    <!-- Settings Button -->
+    <button class="settings-button" id="settingsButton">⚙️</button>
+    
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Recipe Settings</h2>
+            <form class="settings-form" id="settingsForm">
+                <label for="glucosePercent">Glucose Percentage:</label>
+                <input type="number" id="glucosePercent" min="0" max="100" value="55.56" step="0.01">
+                <div id="fructoseDisplay" style="margin-bottom: 15px; padding: 8px; background-color: #f8f9fa; border-radius: 4px; text-align: center; font-weight: bold;">
+                    Fructose: 44.44%
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" style="flex: 1;">Update Recipe</button>
+                    <button type="button" id="resetButton" style="flex: 1; background-color: #6c757d;">Reset</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <main id="main">
     <header>
         <h1>Batch #7</h1>
@@ -181,12 +296,80 @@
     </main>
 
     <script>
+        // Global variables for custom ratios
+        let glucoseRatio = 0.5556;
+        let fructoseRatio = 0.4444;
+        
+        // Settings modal functionality
+        document.getElementById('settingsButton').addEventListener('click', function() {
+            document.getElementById('settingsModal').style.display = 'block';
+        });
+        
+        document.querySelector('.close').addEventListener('click', function() {
+            document.getElementById('settingsModal').style.display = 'none';
+        });
+        
+        window.addEventListener('click', function(event) {
+            if (event.target == document.getElementById('settingsModal')) {
+                document.getElementById('settingsModal').style.display = 'none';
+            }
+        });
+        
+        // Real-time fructose calculation
+        document.getElementById('glucosePercent').addEventListener('input', function() {
+            const glucosePercent = parseFloat(this.value) || 0;
+            const fructosePercent = 100 - glucosePercent;
+            document.getElementById('fructoseDisplay').textContent = `Fructose: ${fructosePercent.toFixed(2)}%`;
+        });
+        
+        // Reset button functionality
+        document.getElementById('resetButton').addEventListener('click', function() {
+            // Reset to original values
+            document.getElementById('glucosePercent').value = '55.56';
+            document.getElementById('fructoseDisplay').textContent = 'Fructose: 44.44%';
+            
+            // Update global ratios
+            glucoseRatio = 0.5556;
+            fructoseRatio = 0.4444;
+            
+            // Update the header text
+            document.querySelector('header p').textContent = 
+                'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of 2:1';
+        });
+        
+        // Settings form submission
+        document.getElementById('settingsForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const glucosePercent = parseFloat(document.getElementById('glucosePercent').value);
+            const fructosePercent = 100 - glucosePercent;
+            
+            // Validate that glucose percentage is within valid range
+            if (glucosePercent < 0 || glucosePercent > 100) {
+                alert('Glucose percentage must be between 0% and 100%');
+                return;
+            }
+            
+            // Update global ratios
+            glucoseRatio = glucosePercent / 100;
+            fructoseRatio = fructosePercent / 100;
+            
+            // Close modal
+            document.getElementById('settingsModal').style.display = 'none';
+            
+            // Update the header text
+            const ratioText = glucosePercent > fructosePercent ? 
+                `${glucosePercent.toFixed(1)}:${fructosePercent.toFixed(1)}` : 
+                `${fructosePercent.toFixed(1)}:${glucosePercent.toFixed(1)}`;
+            document.querySelector('header p').textContent = 
+                `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of ${ratioText}`;
+        });
+        
         // JavaScript for Calculator 1
         document.getElementById('carbohydrateForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const totalCarbs = parseFloat(document.getElementById('totalCarbs').value);
-            const glucose = (totalCarbs * 0.5556).toFixed(2);
-            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const glucose = (totalCarbs * glucoseRatio).toFixed(2);
+            const fructose = (totalCarbs * fructoseRatio).toFixed(2);
             const pectin = (totalCarbs * 0.005).toFixed(2);
             const water = (totalCarbs * 0.37 + 35).toFixed(2);
             document.getElementById('result1').innerHTML = `
@@ -209,8 +392,8 @@
             const numberOfGels = parseInt(document.getElementById('numberOfGels').value);
             const carbsPerGel = parseFloat(document.getElementById('carbsPerGel').value);
             const totalCarbs = numberOfGels * carbsPerGel;
-            const glucose = (totalCarbs * 0.5556).toFixed(2);
-            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const glucose = (totalCarbs * glucoseRatio).toFixed(2);
+            const fructose = (totalCarbs * fructoseRatio).toFixed(2);
             const pectin = (totalCarbs * 0.005).toFixed(2);
             const water = (totalCarbs * 0.37 + 35).toFixed(2);
             document.getElementById('result2').innerHTML = `
@@ -249,8 +432,8 @@
             const raceHours = parseFloat(document.getElementById('raceHours').value);
             const carbsPerHour = parseFloat(document.getElementById('carbsPerHour').value);
             const totalCarbs = raceHours * carbsPerHour;
-            const glucose = (totalCarbs * 0.5556).toFixed(2);
-            const fructose = (totalCarbs * 0.4444).toFixed(2);
+            const glucose = (totalCarbs * glucoseRatio).toFixed(2);
+            const fructose = (totalCarbs * fructoseRatio).toFixed(2);
             const pectin = (totalCarbs * 0.005).toFixed(2);
             const water = (totalCarbs * 0.37 + 35).toFixed(2);
             document.getElementById('result4').innerHTML = `
