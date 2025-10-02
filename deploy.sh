@@ -28,7 +28,7 @@ fi
 if ! git remote get-url origin > /dev/null 2>&1; then
     echo "⚠️  No remote repository found!"
     echo "Please add your GitHub repository as origin:"
-    echo "git remote add origin https://github.com/yourusername/gel.git"
+    echo "git remote add origin https://github.com/hanserino/gel.git"
     echo ""
     echo "Then run this script again."
     exit 1
