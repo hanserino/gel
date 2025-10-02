@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PWA Icon Generator - Gel Calculator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .icon-preview { 
+            display: inline-block; 
+            margin: 10px; 
+            text-align: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+        }
+        canvas { 
+            border: 1px solid #ccc; 
+            margin: 5px; 
+            border-radius: 4px;
+        }
+        .download-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 5px;
+            font-size: 12px;
+        }
+        .download-btn:hover {
+            background: #45a049;
+        }
+        .instructions {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .status {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .icon-design {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 PWA Icon Generator for Gel Calculator</h1>
+        
+        <div class="icon-design">
+            <h3>Icon Design Preview</h3>
+            <canvas id="preview" width="128" height="128" style="border: 2px solid #333; margin: 10px;"></canvas>
+            <p><strong>Design:</strong> Green circle with "GC" text (Gel Calculator)</p>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Click "Download" on each icon below</li>
+                <li>Save them in the <code>icons/</code> directory</li>
+                <li>Make sure the file names match exactly (e.g., <code>icon-192x192.png</code>)</li>
+                <li>Deploy to gelcalculator.com</li>
+            </ol>
+        </div>
+        
+        <div class="status">
+            <strong>Status:</strong> Generating icons... <span id="status"></span>
+        </div>
+        
+        <div id="icons"></div>
+    </div>
+    
+    <script>
+        const sizes = [16, 32, 72, 96, 128, 144, 152, 167, 180, 192, 384, 512];
+        const container = document.getElementById('icons');
+        const status = document.getElementById('status');
+        let generated = 0;
+        
+        // Create preview icon
+        function createPreviewIcon() {
+            const canvas = document.getElementById('preview');
+            const ctx = canvas.getContext('2d');
+            const size = 128;
+            
+            // Create green circle
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 4, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add white "GC" text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size/4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('GC', size/2, size/2);
+        }
+        
+        function updateStatus() {
+            status.textContent = `Generated ${generated}/${sizes.length} icons`;
+        }
+        
+        function createIcon(size) {
+            const canvas = document.createElement('canvas');
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+            
+            // Create a green circle with "GC" text
+            ctx.fillStyle = '#4CAF50';
+            ctx.beginPath();
+            ctx.arc(size/2, size/2, size/2 - 2, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            // Add white text
+            ctx.fillStyle = 'white';
+            ctx.font = `bold ${size/4}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('GC', size/2, size/2);
+            
+            return canvas;
+        }
+        
+        // Generate all icons
+        sizes.forEach((size, index) => {
+            const canvas = createIcon(size);
+            
+            // Create preview container
+            const preview = document.createElement('div');
+            preview.className = 'icon-preview';
+            preview.innerHTML = `
+                <canvas width="${size}" height="${size}"></canvas>
+                <br><strong>icon-${size}x${size}.png</strong>
+                <br><button class="download-btn" onclick="downloadIcon(${size})">Download</button>
+            `;
+            
+            // Copy the canvas content to preview
+            const previewCanvas = preview.querySelector('canvas');
+            const previewCtx = previewCanvas.getContext('2d');
+            previewCtx.drawImage(canvas, 0, 0);
+            
+            container.appendChild(preview);
+            generated++;
+            updateStatus();
+        });
+        
+        function downloadIcon(size) {
+            const canvas = createIcon(size);
+            
+            // Download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `icon-${size}x${size}.png`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            });
+        }
+        
+        // Create preview icon
+        createPreviewIcon();
+        
+        // Update status when complete
+        setTimeout(() => {
+            status.textContent = `✅ All ${sizes.length} icons generated! Click download buttons to save them.`;
+            status.style.background = '#d1ecf1';
+            status.style.color = '#0c5460';
+        }, 100);
+    </script>
+</body>
+</html>

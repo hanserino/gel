@@ -1,13 +1,13 @@
 {
-  "name": "Batch #7 - Sports Gel Calculator",
-  "short_name": "Batch #7",
+  "name": "Gel Calculator - Sports Nutrition",
+  "short_name": "Gel Calculator",
   "description": "Professional sports gel calculator based on Jon Albon's winning CCC 2023 recipe. Calculate perfect glucose to fructose ratios for your training and racing.",
-  "start_url": "/gel/",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
   "orientation": "portrait-primary",
-  "scope": "/gel/",
+  "scope": "/",
   "lang": "en",
   "categories": ["sports", "health", "utilities"],
   "icons": [
