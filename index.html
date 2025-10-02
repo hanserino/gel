@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gel Calculator - Save money, your gut and the planet</title>
+    <title>Sports Gel Calculator</title>
     
     <!-- PWA Meta Tags -->
     <meta name="description" content="Professional sports gel calculator based on Jon Albon's winning CCC 2023 recipe. Calculate perfect glucose to fructose ratios for your training and racing.">
@@ -406,18 +406,30 @@
             margin: 10px 0;
             width: auto;
         }
+
         
     </style>
 </head>
 <body>
     <!-- Settings Button -->
     <button class="settings-button" id="settingsButton">⚙️</button>
-    
+        
     <!-- Settings Modal -->
     <div id="settingsModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
-            <h2>Recipe Settings</h2>
+            <h2>Settings</h2>
+            
+            <!-- Country Selection -->
+            <div style="margin-bottom: 20px;">
+                <label for="countrySelect" style="display: block; margin-bottom: 8px; font-weight: bold;">Shopping Region:</label>
+                <select id="countrySelect" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
+                    <option value="international">🌍 Amazon</option>
+                    <option value="norwegian">🇳🇴 Norway</option>
+                </select>
+            </div>
+            
+            <h3>Recipe Settings</h3>
             <form class="settings-form" id="settingsForm">
                 <label for="glucosePercent">Glucose Percentage:</label>
                 <input type="number" id="glucosePercent" min="0" max="100" value="55.56" step="0.01">
@@ -435,8 +447,8 @@
     <main id="main">
     <header>
         <h1>Gel Calculator</h1>
-        <p>Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>2:1</strong></p>
-        <a href="https://www.youtube.com/embed/C7yvQb9mkEw?si=9bBh_Ng-jdw2gFdk" target="_blank">Watch how Jon makes the gel</a>.
+        <p>Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>2:1</strong>.</p>
+        <a href="https://www.youtube.com/embed/C7yvQb9mkEw?si=9bBh_Ng-jdw2gFdk" target="_blank">Watch the instructional video</a>.
 
     </header>
     <!-- First Calculator: Total Carbohydrates -->
@@ -505,36 +517,21 @@
     </details>
 
     <!-- Shopping Section -->
-    <section class="shopping-section" style="margin: 40px 0;">
-        <div class="shopping-title">🛒 Buy Ingredients</div>
-        <p>Get ingredients in bulk and each gel will cost you a 10th of the price of a store bought gel. This way you can use the gels in training without spending a fortune.</p>
+    <section class="shopping-section" style="margin: 40px 0;" id="shoppingSection">
+        <div class="shopping-title">🛒 Ingredients</div>
+        <p id="shoppingDescription">Buy your ingredients in bulk and each gel will cost you a 10th of the price of a store bought gel.</p>
 
-        <div class="shopping-links">
-            <a href="https://www.amazon.com/dp/B01H4BTWHE?tag=fokkasfalt-20" target="_blank" class="shopping-link">
-                🍯 Glucose Powder
-            </a>
-            <a href="https://www.amazon.com/dp/B079CQHNC7?tag=fokkasfalt-20" target="_blank" class="shopping-link">
-                🍎 Fructose Powder
-            </a>
-            <a href="https://www.amazon.com/dp/B0096UW0J4?tag=fokkasfalt-20" target="_blank" class="shopping-link">
-                🧪 Pectin
-            </a>
-            <a href="https://www.amazon.com/dp/B0BRBP8C97?tag=fokkasfalt-20" target="_blank" class="shopping-link">
-                📦 Gel Soft Flask
-            </a>
-            <a href="https://www.amazon.com/dp/B00JSY3NWQ?tag=fokkasfalt-20" target="_blank" class="shopping-link">
-                🍍 Flavor Drops
-            </a>
+        <div class="shopping-links" id="shoppingLinks">
+            <!-- Links will be populated by JavaScript -->
         </div>
-        <div class="shopping-note">
-            As an Amazon Associate, we earn from qualifying purchases<br>
-            <small>Links automatically redirect to your local Amazon store</small>
+        <div class="shopping-note" id="shoppingNote">
+            <!-- Note will be populated by JavaScript -->
         </div>
     </section>
 
     <footer>
         <p>Made by <a href="https://www.instagram.com/hanserino/" target="_blank">@hanserino</a>.</p>
-        <img src="fokkasfalt.png" alt="Føkk Asfalt">
+        <a href="https://naerdetalvor.no/" target="_blank"><img src="neda-logo.png" alt="Nå er det alvor"></a>
     </footer>
 
     </main>
@@ -543,6 +540,97 @@
         // Global variables for custom ratios
         let glucoseRatio = 0.5556;
         let fructoseRatio = 0.4444;
+        
+        // Location detection and shopping links
+        let isNorwegian = false;
+        let shoppingLinks = {
+            international: {
+                glucose: 'https://www.amazon.com/dp/B01H4BTWHE?tag=fokkasfalt-20',
+                fructose: 'https://www.amazon.com/dp/B079CQHNC7?tag=fokkasfalt-20',
+                pectin: 'https://www.amazon.com/dp/B0096UW0J4?tag=fokkasfalt-20',
+                flask: 'https://www.amazon.com/dp/B0BRBP8C97?tag=fokkasfalt-20',
+                flavor: 'https://www.amazon.com/dp/B00JSY3NWQ?tag=fokkasfalt-20',
+                scale: 'https://www.amazon.com/dp/B01E6RE3A0?tag=fokkasfalt-20'
+            },
+            norwegian: {
+                glucose: 'https://www.extremefitness.no/products/self-maltodextrin-karbohydrater-1-kg',
+                fructose: 'https://www.olbrygging.no/vinoferm/101988/fruktose-5-kg',
+                pectin: 'https://www.thekitchenlab.no/p/pektin-e440-the-kitchen-lab-100-g/',
+                flask: 'https://www.fjellsport.no/merker/hydrapak/hydrapak-softflask-150-ml-malibu-blue-342-0088',
+                flavor: 'https://www.thekitchenlab.no/p/smaksdraper-30-ml-flere-smaker-the-kitchen-lab-ananas/',
+                scale: 'https://cdon.no/produkt/kjokkenvekt-ks209-3kg-01g-750057baf4a758e9/'
+            }
+        };
+        
+        // Detect if user is from Norway
+        function detectLocation() {
+            // Method 1: Browser language detection
+            const language = navigator.language || navigator.userLanguage;
+            const isNorwegianLanguage = language.startsWith('no') || language.startsWith('nb') || language.startsWith('nn');
+            
+            // Method 2: Timezone detection (fallback)
+            const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const isNorwegianTimezone = timezone === 'Europe/Oslo';
+            
+            // Set Norwegian if either method detects Norway
+            isNorwegian = isNorwegianLanguage || isNorwegianTimezone;
+            
+            console.log('Location detection:', {
+                language: language,
+                timezone: timezone,
+                isNorwegian: isNorwegian
+            });
+        }
+        
+        // Get shopping links based on location
+        function getShoppingLinks() {
+            return isNorwegian ? shoppingLinks.norwegian : shoppingLinks.international;
+        }
+        
+        // Populate shopping section based on location
+        function populateShoppingSection() {
+            const links = getShoppingLinks();
+            const isNorwegianUser = isNorwegian;
+            
+            // Update the select dropdown to show current selection
+            const selectElement = document.getElementById('countrySelect');
+            if (selectElement) {
+                selectElement.value = isNorwegianUser ? 'norwegian' : 'international';
+            }
+            
+            // Update description
+            const description = 'Buy your ingredients in bulk and each gel will cost you a 10th of the price of a store bought gel.';
+            document.getElementById('shoppingDescription').textContent = description;
+            
+            // Update shopping links
+            const shoppingLinksHTML = `
+                <a href="${links.glucose}" target="_blank" class="shopping-link">
+                    🍯 Glucose Powder
+                </a>
+                <a href="${links.fructose}" target="_blank" class="shopping-link">
+                    🍎 Fructose Powder
+                </a>
+                <a href="${links.pectin}" target="_blank" class="shopping-link">
+                    🧪 Pectin
+                </a>
+                <a href="${links.flask}" target="_blank" class="shopping-link">
+                    📦 Gel Soft Flask
+                </a>
+                <a href="${links.flavor}" target="_blank" class="shopping-link">
+                    🍍 Flavor Drops
+                </a>
+                <a href="${links.scale}" target="_blank" class="shopping-link">
+                    ⚖️ Precision Scale
+                </a>
+            `;
+            document.getElementById('shoppingLinks').innerHTML = shoppingLinksHTML;
+            
+            // Update note
+            const note = isNorwegianUser ? 
+                'Shop locally in Norway for best prices and fast delivery' :
+                'As an Amazon Associate, we earn from qualifying purchases<br><small>Links automatically redirect to your local Amazon store</small>';
+            document.getElementById('shoppingNote').innerHTML = note;
+        }
         
         // Load settings from localStorage on page load
         function loadSettings() {
@@ -747,7 +835,7 @@
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong> <span style="font-size: 14px; color: #666;">(add more if you want it thicker)</span></li>
                         <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
                     </ul>
                     ${fullscreenButton}
@@ -787,7 +875,7 @@
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong> <span style="font-size: 14px; color: #666;">(add more if you want it thicker)</span></li>
                         <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
                     </ul>
                     ${fullscreenButton}
@@ -850,7 +938,7 @@
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
-                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong> <span style="font-size: 14px; color: #666;">(add more if you want it thicker)</span></li>
                         <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
                     </ul>
                     ${fullscreenButton}
@@ -871,7 +959,15 @@
         
         // Initialize the page with saved settings
         document.addEventListener('DOMContentLoaded', function() {
+            detectLocation();
             loadSettings();
+            populateShoppingSection();
+            
+            // Country select dropdown (top right)
+            document.getElementById('countrySelect').addEventListener('change', function() {
+                isNorwegian = this.value === 'norwegian';
+                populateShoppingSection();
+            });
         });
         
         // PWA Service Worker Registration
