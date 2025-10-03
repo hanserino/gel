@@ -471,8 +471,11 @@
             <form id="gelForm">
                 <label for="numberOfGels">Number of gels you want to make:</label>
                 <input type="number" id="numberOfGels" required>
-                <label for="carbsPerGel">Grams of carbohydrates per gel:</label>
-                <input type="number" id="carbsPerGel" required>
+                <label for="flaskSize">Flask size (ml):</label>
+                <input type="number" id="flaskSize" value="150" required>
+                <div id="flaskCapacityHint" style="font-size: 14px; color: #666; margin: 5px 0; font-style: italic;">
+                    Max carbs per flask: ~117g (automatically calculated)
+                </div>
                 <button type="submit">Calculate</button>
             </form>
             <div id="result2"></div>
@@ -673,7 +676,7 @@
         
         
         // Create fullscreen recipe display for mobile
-        function showMobileFullscreenRecipe(title, glucose, fructose, pectin, water) {
+        function showMobileFullscreenRecipe(title, glucose, fructose, pectin, water, flaskSize = '') {
             if (!isMobile()) return false;
             
             // Track mobile fullscreen usage
@@ -707,6 +710,10 @@
                                 <span>💧 Water</span>
                                 <span class="ingredient-amount">${water}g</span>
                             </li>
+                            ${flaskSize ? `<li class="ingredient-item">
+                                <span>🍼 Flask size</span>
+                                <span class="ingredient-amount">${flaskSize}ml</span>
+                            </li>` : ''}
                         </ul>
                     </div>
                 </div>
@@ -846,11 +853,25 @@
             document.getElementById('result1').scrollIntoView({ behavior: 'smooth' });
         });
 
+        // Update flask capacity hint when flask size changes
+        document.getElementById('flaskSize').addEventListener('input', function() {
+            const flaskSize = parseFloat(this.value) || 0;
+            const maxGelWeight = flaskSize * 1.25;
+            const maxCarbsPerFlask = maxGelWeight * 0.625;
+            document.getElementById('flaskCapacityHint').textContent = `Max carbs per flask: ~${maxCarbsPerFlask.toFixed(0)}g`;
+        });
+
         // JavaScript for Calculator 2
         document.getElementById('gelForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const numberOfGels = parseInt(document.getElementById('numberOfGels').value);
-            const carbsPerGel = parseFloat(document.getElementById('carbsPerGel').value);
+            const flaskSize = parseFloat(document.getElementById('flaskSize').value);
+            
+            // Calculate maximum possible carbohydrates for the flask size
+            // Gel density is approximately 1.25 g/ml, and carbs are ~62.5% of total weight
+            const maxGelWeight = flaskSize * 1.25; // Maximum total gel weight in grams
+            const carbsPerGel = maxGelWeight * 0.625; // Maximum carbs that fit in flask (automatically calculated)
+            
             const totalCarbs = numberOfGels * carbsPerGel;
             const glucose = (totalCarbs * glucoseRatio).toFixed(2);
             const fructose = (totalCarbs * fructoseRatio).toFixed(2);
@@ -861,7 +882,8 @@
             gtag('event', 'calculator_used', {
                 'calculator_type': 'gel_amount',
                 'number_of_gels': numberOfGels,
-                'carbs_per_gel': carbsPerGel,
+                'carbs_per_gel': carbsPerGel.toFixed(1),
+                'flask_size_ml': flaskSize,
                 'total_carbs': totalCarbs,
                 'glucose_ratio': (glucoseRatio * 100).toFixed(1),
                 'fructose_ratio': (fructoseRatio * 100).toFixed(1)
@@ -869,16 +891,18 @@
             
             // Always show normal display first
             const fullscreenButton = isMobile() ? 
-                `<div class="actions"><button class="fullscreen-button" onclick="showMobileFullscreenRecipe('${numberOfGels} gels (${totalCarbs}g total) ingredients', '${glucose}', '${fructose}', '${pectin}', '${water}')">📱 Go Fullscreen</button></div>` : '';
+                `<div class="actions"><button class="fullscreen-button" onclick="showMobileFullscreenRecipe('${numberOfGels} gels (${totalCarbs}g total) ingredients', '${glucose}', '${fructose}', '${pectin}', '${water}', '${flaskSize}')">📱 Go Fullscreen</button></div>` : '';
             
             document.getElementById('result2').innerHTML = `
                 <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #4CAF50;">
-                    <h3 style="margin-top: 0; color: #333; text-align: center;">${numberOfGels} gels (${totalCarbs}g total) ingredients:</h3>
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">${numberOfGels} gels (${totalCarbs.toFixed(1)}g total) ingredients:</h3>
+                    <p style="text-align: center; color: #666; margin: 10px 0; font-size: 16px;">Each gel contains <strong>${carbsPerGel.toFixed(1)}g</strong> of carbohydrates (maximized for ${flaskSize}ml flask)</p>
                     <ul style="list-style: none; padding: 0; margin: 0;">
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Glucose: <strong>${glucose}g</strong></li>
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🍯 Fructose: <strong>${fructose}g</strong></li>
                         <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">🧪 Pectin: <strong>${pectin}g</strong> <span style="font-size: 14px; color: #666;">(add more if you want it thicker)</span></li>
-                        <li style="padding: 8px 0; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
+                        <li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">💧 Water: <strong>${water}g</strong> <span style="font-size: 14px; color: #666;">(including evaporation compensation)</span></li>
+                        <li style="padding: 8px 0; font-size: 18px;">🍼 Flask size: <strong>${flaskSize}ml</strong> <span style="font-size: 14px; color: #666;">(per gel)</span></li>
                     </ul>
                     ${fullscreenButton}
                 </div>
