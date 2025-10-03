@@ -327,12 +327,8 @@
         }
         
         /* Shopping Links Styles */
-        .shopping-section {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
+        #shoppingSection {
             padding: 15px;
-            margin: 15px 0;
             text-align: center;
         }
         
@@ -517,17 +513,19 @@
     </details>
 
     <!-- Shopping Section -->
-    <section class="shopping-section" style="margin: 40px 0;" id="shoppingSection">
-        <div class="shopping-title">🛒 Ingredients</div>
-        <p id="shoppingDescription">Buy your ingredients in bulk and each gel will cost you a 10th of the price of a store bought gel.</p>
+    <details class="calculator-details" style="margin: 60px 0 40px 0;">
+        <summary class="calculator-summary">🛒 Buy Ingredients</summary>
+        <div class="calculator-content" id="shoppingSection">
+            <p id="shoppingDescription">Buy your ingredients in bulk and each gel will cost you a 10th of the price of a store bought gel.</p>
 
-        <div class="shopping-links" id="shoppingLinks">
-            <!-- Links will be populated by JavaScript -->
+            <div class="shopping-links" id="shoppingLinks">
+                <!-- Links will be populated by JavaScript -->
+            </div>
+            <div class="shopping-note" id="shoppingNote">
+                <!-- Note will be populated by JavaScript -->
+            </div>
         </div>
-        <div class="shopping-note" id="shoppingNote">
-            <!-- Note will be populated by JavaScript -->
-        </div>
-    </section>
+    </details>
 
     <footer>
         <p>Made by <a href="https://www.instagram.com/hanserino/" target="_blank">@hanserino</a>.</p>
