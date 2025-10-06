@@ -1,4 +1,4 @@
-const CACHE_NAME = 'batch-7-gel-calculator-v1';
+const CACHE_NAME = 'batch-7-gel-calculator-v2';
 const urlsToCache = [
   '/',
   '/index.html',
