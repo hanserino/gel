@@ -44,6 +44,14 @@ input, button {
     border-radius: 4px; /* Rounded corners for inputs */
     font-size: 16px; /* Increase font size for better readability */
 }
+
+/* Checkbox specific styling */
+input[type="checkbox"] {
+    width: auto !important; /* Override full width for checkboxes */
+    margin: 0 8px 0 0; /* Margin on right side of checkbox */
+    padding: 0; /* Remove padding for checkboxes */
+    vertical-align: middle; /* Align with text */
+}
 button {
     background-color: #4CAF50; /* Green background */
     border: none; /* No border */
@@ -172,7 +180,12 @@ p {
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
+
+    &[type="checkbox"] {
+        margin-bottom: 4px;
+    }
 }
+
 
 .settings-form button {
     background-color: #4CAF50;

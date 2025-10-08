@@ -65,18 +65,30 @@
                 </div>
                 
                 <h4 style="margin: 20px 0 10px 0; color: #333;">Electrolytes</h4>
-                <div class="toggle-group" id="electrolyteMethodToggle">
-                    <label class="toggle-option" for="methodPerGel">
-                        <input type="radio" name="electrolyteMethod" id="methodPerGel" value="perGel" checked>
-                        <span>Per-gel mg</span>
-                    </label>
-                    <label class="toggle-option" for="methodCapsules">
-                        <input type="radio" name="electrolyteMethod" id="methodCapsules" value="capsules">
-                        <span>Capsules</span>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="includeElectrolytes" name="includeElectrolytes">
+                        Include electrolytes in recipes
                     </label>
                 </div>
+                
+                <div id="electrolyteMethodSection" style="display: none;">
+                    <div class="toggle-group" id="electrolyteMethodToggle">
+                        <label class="toggle-option" for="methodPerGel">
+                            <input type="radio" name="electrolyteMethod" id="methodPerGel" value="perGel" checked>
+                            <span>Per-gel mg</span>
+                        </label>
+                        <label class="toggle-option" for="methodCapsules">
+                            <input type="radio" name="electrolyteMethod" id="methodCapsules" value="capsules">
+                            <span>Capsules</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="electrolyteSettings" style="display: none;">
+                    <div id="electrolyteSummary" style="font-size: 14px; color: #555; margin: 8px 0 12px 0;"></div>
 
-                <div id="perGelSettings">
+                    <div id="perGelSettings">
                     <label for="sodiumMg">Sodium (mg per gel):</label>
                     <input type="number" id="sodiumMg" min="0" max="500" value="0" step="10" placeholder="0-200mg typical">
                     
@@ -100,9 +112,20 @@
                         <div style="font-size: 12px; color: #666;">Reference: Precision Hydration electrolyte capsules guidance [PH].</div>
                 </div>
                 
-                <h4 style="margin: 20px 0 10px 0; color: #333;">Caffeine (per gel)</h4>
-                <label for="caffeineMg">Caffeine (mg):</label>
-                <input type="number" id="caffeineMg" min="0" max="200" value="0" step="5" placeholder="0-100mg typical">
+                </div> <!-- Close electrolyteSettings -->
+                
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="includeCaffeine" name="includeCaffeine">
+                        Include caffeine in recipes
+                    </label>
+                </div>
+                
+                <div id="caffeineSettings" style="display: none;">
+                    <h4 style="margin: 20px 0 10px 0; color: #333;">Caffeine (per gel)</h4>
+                    <label for="caffeineMg">Caffeine (mg):</label>
+                    <input type="number" id="caffeineMg" min="0" max="200" value="0" step="5" placeholder="0-100mg typical">
+                </div>
                 
                 <h4 style="margin: 20px 0 10px 0; color: #333;">Gel Settings</h4>
                 <label for="defaultFlaskSize">Default Flask Size (ml):</label>
@@ -229,6 +252,8 @@
         let fructoseRatio = 0.4444;
         
         // Global variables for electrolytes and caffeine
+        let includeElectrolytes = false;
+        let includeCaffeine = false;
         let sodiumMg = 0;
         let potassiumMg = 0;
         let magnesiumMg = 0;
@@ -237,7 +262,7 @@
         // Capsule mode state
         let useCapsules = false; // derived from method radios
         let capsuleSodiumMg = 250;
-        let capsulePotassiumMg = 0;
+        let capsulePotassiumMg = 125;
         let capsuleMagnesiumMg = 0;
         let capsulesPer500ml = 2;
         
@@ -355,6 +380,8 @@
             const savedCapK = localStorage.getItem('gelCapsuleKMg');
             const savedCapMg = localStorage.getItem('gelCapsuleMgMg');
             const savedCapsulesPer500 = localStorage.getItem('gelCapsulesPer500ml');
+            const savedIncludeElectrolytes = localStorage.getItem('gelIncludeElectrolytes');
+            const savedIncludeCaffeine = localStorage.getItem('gelIncludeCaffeine');
             
             if (savedGlucose && savedFructose) {
                 glucoseRatio = parseFloat(savedGlucose);
@@ -381,6 +408,17 @@
             }
             
             // Load electrolyte and caffeine settings
+            if (savedIncludeElectrolytes) {
+                includeElectrolytes = savedIncludeElectrolytes === 'true';
+                document.getElementById('includeElectrolytes').checked = includeElectrolytes;
+                document.getElementById('electrolyteMethodSection').style.display = includeElectrolytes ? 'block' : 'none';
+                document.getElementById('electrolyteSettings').style.display = includeElectrolytes ? 'block' : 'none';
+            }
+            if (savedIncludeCaffeine) {
+                includeCaffeine = savedIncludeCaffeine === 'true';
+                document.getElementById('includeCaffeine').checked = includeCaffeine;
+                document.getElementById('caffeineSettings').style.display = includeCaffeine ? 'block' : 'none';
+            }
             if (savedSodium) {
                 sodiumMg = parseInt(savedSodium);
                 document.getElementById('sodiumMg').value = sodiumMg;
@@ -450,6 +488,8 @@
             localStorage.setItem('gelMagnesiumMg', magnesium.toString());
             localStorage.setItem('gelCaffeineMg', caffeine.toString());
             localStorage.setItem('gelDefaultFlaskSize', flaskSize.toString());
+            localStorage.setItem('gelIncludeElectrolytes', includeElectrolytes.toString());
+            localStorage.setItem('gelIncludeCaffeine', includeCaffeine.toString());
             // Capsule mode
             localStorage.setItem('gelUseCapsules', useCapsules.toString());
             localStorage.setItem('gelCapsuleNaMg', capsuleSodiumMg.toString());
@@ -463,9 +503,60 @@
             return window.innerWidth <= 768 || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         }
         
+        // Update electrolyte UI (visibility + summary)
+        function updateElectrolyteUI() {
+            const perGelEl = document.getElementById('methodPerGel');
+            const capsEl = document.getElementById('methodCapsules');
+            const perGelBox = document.getElementById('perGelSettings');
+            const capsBox = document.getElementById('capsuleSettings');
+            const toggle = document.getElementById('electrolyteMethodToggle');
+            const summary = document.getElementById('electrolyteSummary');
+            // inputs
+            const sodiumInput = document.getElementById('sodiumMg');
+            const potassiumInput = document.getElementById('potassiumMg');
+            const magnesiumInput = document.getElementById('magnesiumMg');
+            const cafInput = document.getElementById('caffeineMg');
+            const capNaInput = document.getElementById('capsuleSodiumMg');
+            const capKInput = document.getElementById('capsulePotassiumMg');
+            const capMgInput = document.getElementById('capsuleMagnesiumMg');
+            const capsPer500Input = document.getElementById('capsulesPer500ml');
+            const flaskInput = document.getElementById('defaultFlaskSize');
+
+            // Visibility
+            useCapsules = !!(capsEl && capsEl.checked);
+            if (perGelBox) perGelBox.style.display = useCapsules ? 'none' : 'block';
+            if (capsBox) capsBox.style.display = useCapsules ? 'block' : 'none';
+            if (toggle) {
+                toggle.querySelectorAll('.toggle-option').forEach(function(opt){
+                    const input = opt.querySelector('input[type="radio"]');
+                    if (input && input.checked) opt.classList.add('active'); else opt.classList.remove('active');
+                });
+            }
+
+            // Summary
+            if (summary) {
+                if (useCapsules) {
+                    const capsPerGel = (((parseFloat(capsPer500Input && capsPer500Input.value) || capsulesPer500ml) / 500) * (parseFloat(flaskInput && flaskInput.value) || defaultFlaskSize));
+                    summary.textContent = `~${capsPerGel.toFixed(2)} caps per gel`;
+                } else {
+                    const na = parseInt(sodiumInput && sodiumInput.value) || sodiumMg || 0;
+                    const k = parseInt(potassiumInput && potassiumInput.value) || potassiumMg || 0;
+                    const mg = parseInt(magnesiumInput && magnesiumInput.value) || magnesiumMg || 0;
+                    const caf = parseInt(cafInput && cafInput.value) || caffeineMg || 0;
+                    summary.textContent = `Per gel: Na ${na}mg, K ${k}mg, Mg ${mg}mg${caf?`, Caffeine ${caf}mg`:''}`;
+                }
+            }
+        }
+
         // Helper function to generate electrolyte and caffeine display
         function getElectrolyteCaffeineDisplay(totalCarbs, carbsPerGel = null) {
             let display = '';
+            
+            // Only show electrolytes/caffeine if enabled
+            if (!includeElectrolytes && !includeCaffeine) {
+                return display;
+            }
+            
             // Determine gels
             let numberOfGels = 1;
             if (carbsPerGel && carbsPerGel > 0) {
@@ -496,26 +587,28 @@
             const totalK = Math.round(perGelK * numberOfGels);
             const totalMg = Math.round(perGelMg * numberOfGels);
 
-            if ((useCapsules && capsulesPer500ml > 0) || perGelNa > 0 || perGelK > 0 || perGelMg > 0 || caffeineMg > 0) {
+            if (includeElectrolytes && ((useCapsules && capsulesPer500ml > 0) || perGelNa > 0 || perGelK > 0 || perGelMg > 0) || (includeCaffeine && caffeineMg > 0)) {
                 display += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid #4CAF50;">';
                 display += '<h4 style="margin: 0 0 10px 0; color: #4CAF50; text-align: center;">Additional Ingredients</h4>';
                 display += '<ul style="list-style: none; padding: 0; margin: 0;">';
-                if (useCapsules && capsulesPer500ml > 0) {
-                    const capsPerGel = (capsulesPer500ml / 500) * defaultFlaskSize;
-                    const totalCaps = capsPerGel * numberOfGels;
-                    display += `<li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">💊 Electrolyte capsules: <strong>${totalCaps.toFixed(2)} caps</strong> <span style="font-size: 14px; color: #666;">(~${capsPerGel.toFixed(2)} caps per gel)</span></li>`;
-                } else {
-                    if (perGelNa > 0) {
-                        display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">🧂 Sodium: <strong>${totalNa}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelNa)}mg per gel)</span></li>`;
-                    }
-                    if (perGelK > 0) {
-                        display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">🥔 Potassium: <strong>${totalK}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelK)}mg per gel)</span></li>`;
-                    }
-                    if (perGelMg > 0) {
-                        display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">⚡ Magnesium: <strong>${totalMg}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelMg)}mg per gel)</span></li>`;
+                if (includeElectrolytes) {
+                    if (useCapsules && capsulesPer500ml > 0) {
+                        const capsPerGel = (capsulesPer500ml / 500) * defaultFlaskSize;
+                        const totalCaps = capsPerGel * numberOfGels;
+                        display += `<li style="padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;">💊 Electrolyte capsules: <strong>${totalCaps.toFixed(2)} caps</strong> <span style="font-size: 14px; color: #666;">(~${capsPerGel.toFixed(2)} caps per gel)</span></li>`;
+                    } else {
+                        if (perGelNa > 0) {
+                            display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">🧂 Sodium: <strong>${totalNa}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelNa)}mg per gel)</span></li>`;
+                        }
+                        if (perGelK > 0) {
+                            display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">🥔 Potassium: <strong>${totalK}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelK)}mg per gel)</span></li>`;
+                        }
+                        if (perGelMg > 0) {
+                            display += `<li style=\"padding: 8px 0; border-bottom: 1px solid #eee; font-size: 18px;\">⚡ Magnesium: <strong>${totalMg}mg</strong> <span style=\"font-size: 14px; color: #666;\">(${Math.round(perGelMg)}mg per gel)</span></li>`;
+                        }
                     }
                 }
-                if (caffeineMg > 0) {
+                if (includeCaffeine && caffeineMg > 0) {
                     const totalCaf = caffeineMg * numberOfGels;
                     display += `<li style="padding: 8px 0; font-size: 18px;">☕ Caffeine: <strong>${totalCaf}mg</strong> <span style="font-size: 14px; color: #666;">(${caffeineMg}mg per gel)</span></li>`;
                 }
@@ -554,27 +647,29 @@
             
             // Generate additional ingredients display
             let additionalIngredients = '';
-            if (sodiumMg > 0 || potassiumMg > 0 || magnesiumMg > 0 || caffeineMg > 0) {
+            if ((includeElectrolytes && (sodiumMg > 0 || potassiumMg > 0 || magnesiumMg > 0)) || (includeCaffeine && caffeineMg > 0)) {
                 additionalIngredients += '<li class="ingredient-item" style="border-top: 2px solid #4CAF50; margin-top: 10px; padding-top: 10px;"><span style="color: #4CAF50; font-weight: bold;">Additional Ingredients</span><span></span></li>';
-                if (useCapsules && capsulesPer500ml > 0) {
-                    const capsPerGel = (capsulesPer500ml / 500) * defaultFlaskSize;
-                    const totalCaps = capsPerGel * numberOfGels;
-                    additionalIngredients += `<li class="ingredient-item"><span>💊 Electrolyte capsules</span><span class="ingredient-amount">${totalCaps.toFixed(2)} caps</span></li>`;
-                } else {
-                    if (sodiumMg > 0) {
-                        const totalSodium = sodiumMg * numberOfGels;
-                        additionalIngredients += `<li class="ingredient-item"><span>🧂 Sodium</span><span class="ingredient-amount">${totalSodium}mg</span></li>`;
-                    }
-                    if (potassiumMg > 0) {
-                        const totalPotassium = potassiumMg * numberOfGels;
-                        additionalIngredients += `<li class="ingredient-item"><span>🥔 Potassium</span><span class="ingredient-amount">${totalPotassium}mg</span></li>`;
-                    }
-                    if (magnesiumMg > 0) {
-                        const totalMagnesium = magnesiumMg * numberOfGels;
-                        additionalIngredients += `<li class="ingredient-item"><span>⚡ Magnesium</span><span class="ingredient-amount">${totalMagnesium}mg</span></li>`;
+                if (includeElectrolytes) {
+                    if (useCapsules && capsulesPer500ml > 0) {
+                        const capsPerGel = (capsulesPer500ml / 500) * defaultFlaskSize;
+                        const totalCaps = capsPerGel * numberOfGels;
+                        additionalIngredients += `<li class="ingredient-item"><span>💊 Electrolyte capsules</span><span class="ingredient-amount">${totalCaps.toFixed(2)} caps</span></li>`;
+                    } else {
+                        if (sodiumMg > 0) {
+                            const totalSodium = sodiumMg * numberOfGels;
+                            additionalIngredients += `<li class="ingredient-item"><span>🧂 Sodium</span><span class="ingredient-amount">${totalSodium}mg</span></li>`;
+                        }
+                        if (potassiumMg > 0) {
+                            const totalPotassium = potassiumMg * numberOfGels;
+                            additionalIngredients += `<li class="ingredient-item"><span>🥔 Potassium</span><span class="ingredient-amount">${totalPotassium}mg</span></li>`;
+                        }
+                        if (magnesiumMg > 0) {
+                            const totalMagnesium = magnesiumMg * numberOfGels;
+                            additionalIngredients += `<li class="ingredient-item"><span>⚡ Magnesium</span><span class="ingredient-amount">${totalMagnesium}mg</span></li>`;
+                        }
                     }
                 }
-                if (caffeineMg > 0) {
+                if (includeCaffeine && caffeineMg > 0) {
                     const totalCaffeine = caffeineMg * numberOfGels;
                     additionalIngredients += `<li class="ingredient-item"><span>☕ Caffeine</span><span class="ingredient-amount">${totalCaffeine}mg</span></li>`;
                 }
@@ -640,25 +735,41 @@
             const perGelBox = document.getElementById('perGelSettings');
             const capsBox = document.getElementById('capsuleSettings');
             const toggle = document.getElementById('electrolyteMethodToggle');
+            const summary = document.getElementById('electrolyteSummary');
+            // inputs
+            const sodiumInput = document.getElementById('sodiumMg');
+            const potassiumInput = document.getElementById('potassiumMg');
+            const magnesiumInput = document.getElementById('magnesiumMg');
+            const cafInput = document.getElementById('caffeineMg');
+            const capNaInput = document.getElementById('capsuleSodiumMg');
+            const capKInput = document.getElementById('capsulePotassiumMg');
+            const capMgInput = document.getElementById('capsuleMagnesiumMg');
+            const capsPer500Input = document.getElementById('capsulesPer500ml');
+            const flaskInput = document.getElementById('defaultFlaskSize');
+            
             function updateVisibility() {
-                useCapsules = !!(capsEl && capsEl.checked);
-                if (perGelBox) perGelBox.style.display = useCapsules ? 'none' : 'block';
-                if (capsBox) capsBox.style.display = useCapsules ? 'block' : 'none';
-                if (toggle) {
-                    // reflect active option for styling if needed
-                    toggle.querySelectorAll('.toggle-option').forEach(function(opt){
-                        const input = opt.querySelector('input[type="radio"]');
-                        if (input && input.checked) {
-                            opt.classList.add('active');
-                        } else {
-                            opt.classList.remove('active');
-                        }
-                    });
-                }
+                updateElectrolyteUI();
             }
             if (perGelEl) perGelEl.addEventListener('change', updateVisibility);
             if (capsEl) capsEl.addEventListener('change', updateVisibility);
-            updateVisibility();
+            const includeElectrolytesCheckbox = document.getElementById('includeElectrolytes');
+            if (includeElectrolytesCheckbox) {
+                includeElectrolytesCheckbox.addEventListener('change', function() {
+                    includeElectrolytes = this.checked;
+                    document.getElementById('electrolyteMethodSection').style.display = includeElectrolytes ? 'block' : 'none';
+                    document.getElementById('electrolyteSettings').style.display = includeElectrolytes ? 'block' : 'none';
+                    updateElectrolyteUI();
+                });
+            }
+            const includeCaffeineCheckbox = document.getElementById('includeCaffeine');
+            if (includeCaffeineCheckbox) {
+                includeCaffeineCheckbox.addEventListener('change', function() {
+                    includeCaffeine = this.checked;
+                    document.getElementById('caffeineSettings').style.display = includeCaffeine ? 'block' : 'none';
+                });
+            }
+            [sodiumInput,potassiumInput,magnesiumInput,cafInput,capNaInput,capKInput,capMgInput,capsPer500Input,flaskInput].forEach(function(el){ if(el){ el.addEventListener('input', updateElectrolyteUI); }});
+            updateElectrolyteUI();
         });
         
         window.addEventListener('click', function(event) {
@@ -679,6 +790,11 @@
             // Reset to original values
             document.getElementById('glucosePercent').value = '55.56';
             document.getElementById('fructoseDisplay').textContent = 'Fructose: 44.44%';
+            document.getElementById('includeElectrolytes').checked = false;
+            document.getElementById('includeCaffeine').checked = false;
+            document.getElementById('electrolyteMethodSection').style.display = 'none';
+            document.getElementById('electrolyteSettings').style.display = 'none';
+            document.getElementById('caffeineSettings').style.display = 'none';
             document.getElementById('sodiumMg').value = '0';
             document.getElementById('potassiumMg').value = '0';
             document.getElementById('magnesiumMg').value = '0';
@@ -697,6 +813,8 @@
             // Update global ratios
             glucoseRatio = 0.5556;
             fructoseRatio = 0.4444;
+            includeElectrolytes = false;
+            includeCaffeine = false;
             sodiumMg = 0;
             potassiumMg = 0;
             magnesiumMg = 0;
@@ -711,6 +829,8 @@
             // Clear localStorage to reset to defaults
             localStorage.removeItem('gelGlucoseRatio');
             localStorage.removeItem('gelFructoseRatio');
+            localStorage.removeItem('gelIncludeElectrolytes');
+            localStorage.removeItem('gelIncludeCaffeine');
             localStorage.removeItem('gelSodiumMg');
             localStorage.removeItem('gelPotassiumMg');
             localStorage.removeItem('gelMagnesiumMg');
@@ -727,11 +847,13 @@
                 'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>1.25:1</strong>';
         });
         
-        // Settings form submission
+            // Settings form submission
         document.getElementById('settingsForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const glucosePercent = parseFloat(document.getElementById('glucosePercent').value);
             const fructosePercent = 100 - glucosePercent;
+            includeElectrolytes = document.getElementById('includeElectrolytes').checked;
+            includeCaffeine = document.getElementById('includeCaffeine').checked;
             const sodium = parseInt(document.getElementById('sodiumMg').value) || 0;
             const potassium = parseInt(document.getElementById('potassiumMg').value) || 0;
             const magnesium = parseInt(document.getElementById('magnesiumMg').value) || 0;
@@ -803,6 +925,9 @@
             }
             document.querySelector('header p').innerHTML = 
                 `Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>${ratioText}</strong>`;
+
+            // Refresh electrolyte summary so it doesn't show zeros
+            updateElectrolyteUI();
         });
         
         // JavaScript for Calculator 1
