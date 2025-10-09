@@ -58,10 +58,16 @@
             
             <h3>Recipe Settings</h3>
             <form class="settings-form" id="settingsForm">
-                <label for="glucosePercent">Glucose Percentage:</label>
-                <input type="number" id="glucosePercent" min="0" max="100" value="55.56" step="0.01">
-                <div id="fructoseDisplay" style="margin-bottom: 15px; padding: 8px; background-color: #f8f9fa; border-radius: 4px; text-align: center; font-weight: bold;">
-                    Fructose: 44.44%
+                <h4 id="ratioTitle" style="margin: 20px 0 10px 0; color: #333;">Glucose to Fructose Ratio: 1.25:1</h4>
+                <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div style="flex: 1;">
+                        <label for="glucosePercent">Glucose %:</label>
+                        <input type="number" id="glucosePercent" min="0" max="100" value="55.56" step="0.01" placeholder="55.56">
+                    </div>
+                    <div style="flex: 1;">
+                        <label for="fructosePercent">Fructose %:</label>
+                        <input type="number" id="fructosePercent" min="0" max="100" value="44.44" step="0.01" placeholder="44.44">
+                    </div>
                 </div>
                 
                 <h4 style="margin: 20px 0 10px 0; color: #333;">Additional ingredients</h4>
@@ -276,10 +282,8 @@
                 flask: 'https://www.amazon.com/dp/B0BRBP8C97?tag=fokkasfalt-20',
                 flavor: 'https://www.amazon.com/dp/B00JSY3NWQ?tag=fokkasfalt-20',
                 scale: 'https://www.amazon.com/dp/B01E6RE3A0?tag=fokkasfalt-20',
-                sodium: 'https://www.amazon.com/dp/B0013OX8Y8?tag=fokkasfalt-20',
-                potassium: 'https://www.amazon.com/dp/B00J8F7JUO?tag=fokkasfalt-20',
-                magnesium: 'https://www.amazon.com/dp/B0013OX8Y8?tag=fokkasfalt-20',
-                caffeine: 'https://www.amazon.com/dp/B00J8F7JUO?tag=fokkasfalt-20'
+                electrolytes: 'https://www.precisionhydration.com/eu/en/products/electrolyte-salt-capsules-for-athletes/',
+                caffeine: 'https://www.amazon.com/dp/B0CCFYQNYG?tag=fokkasfalt-20'
             },
             norwegian: {
                 glucose: 'https://www.extremefitness.no/products/self-maltodextrin-karbohydrater-1-kg',
@@ -288,10 +292,8 @@
                 flask: 'https://www.fjellsport.no/merker/hydrapak/hydrapak-softflask-150-ml-malibu-blue-342-0088',
                 flavor: 'https://www.thekitchenlab.no/p/smaksdraper-30-ml-flere-smaker-the-kitchen-lab-ananas/',
                 scale: 'https://cdon.no/produkt/kjokkenvekt-ks209-3kg-01g-750057baf4a758e9/',
-                sodium: 'https://www.apotek1.no/vitaminer-og-kosttilskudd/mineraler/natrium',
-                potassium: 'https://www.apotek1.no/vitaminer-og-kosttilskudd/mineraler/kalium',
-                magnesium: 'https://www.apotek1.no/vitaminer-og-kosttilskudd/mineraler/magnesium',
-                caffeine: 'https://www.apotek1.no/vitaminer-og-kosttilskudd/energi-og-prestasjon/koffein'
+                electrolytes: 'https://fueledup.no/product/elektrolyttkapsler/',
+                caffeine: 'https://www.bodylab.no/shop/bodylab-caffeine-200-643p.html'
             }
         };
         
@@ -352,6 +354,12 @@
                 <a href="${links.flavor}" target="_blank" class="shopping-link">
                     🍍 Flavor Drops
                 </a>
+                <a href="${links.electrolytes}" target="_blank" class="shopping-link">
+                    🧂 Electrolytes
+                </a>
+                <a href="${links.caffeine}" target="_blank" class="shopping-link">
+                    ☕ Caffeine
+                </a>
                 <a href="${links.scale}" target="_blank" class="shopping-link">
                     ⚖️ Precision Scale
                 </a>
@@ -389,8 +397,10 @@
                 
                 // Update the form inputs
                 const glucosePercent = glucoseRatio * 100;
+                const fructosePercent = fructoseRatio * 100;
                 document.getElementById('glucosePercent').value = glucosePercent.toFixed(2);
-                document.getElementById('fructoseDisplay').textContent = `Fructose: ${(fructoseRatio * 100).toFixed(2)}%`;
+                document.getElementById('fructosePercent').value = fructosePercent.toFixed(2);
+                updateRatioTitle();
                 
                 // Update the header text
                 let ratioText;
@@ -778,18 +788,43 @@
             }
         });
         
-        // Real-time fructose calculation
+        // Function to update ratio title
+        function updateRatioTitle() {
+            const glucosePercent = parseFloat(document.getElementById('glucosePercent').value) || 0;
+            const fructosePercent = parseFloat(document.getElementById('fructosePercent').value) || 0;
+            
+            let ratioText;
+            if (Math.abs(glucosePercent - 55.56) < 0.01 && Math.abs(fructosePercent - 44.44) < 0.01) {
+                ratioText = "1.25:1";
+            } else {
+                const ratio = glucosePercent / fructosePercent;
+                ratioText = ratio.toFixed(2) + ":1";
+            }
+            
+            document.getElementById('ratioTitle').textContent = `Glucose to Fructose Ratio: ${ratioText}`;
+        }
+        
+        // Real-time glucose/fructose synchronization
         document.getElementById('glucosePercent').addEventListener('input', function() {
             const glucosePercent = parseFloat(this.value) || 0;
             const fructosePercent = 100 - glucosePercent;
-            document.getElementById('fructoseDisplay').textContent = `Fructose: ${fructosePercent.toFixed(2)}%`;
+            document.getElementById('fructosePercent').value = fructosePercent.toFixed(2);
+            updateRatioTitle();
+        });
+        
+        document.getElementById('fructosePercent').addEventListener('input', function() {
+            const fructosePercent = parseFloat(this.value) || 0;
+            const glucosePercent = 100 - fructosePercent;
+            document.getElementById('glucosePercent').value = glucosePercent.toFixed(2);
+            updateRatioTitle();
         });
         
         // Reset button functionality
         document.getElementById('resetButton').addEventListener('click', function() {
             // Reset to original values
             document.getElementById('glucosePercent').value = '55.56';
-            document.getElementById('fructoseDisplay').textContent = 'Fructose: 44.44%';
+            document.getElementById('fructosePercent').value = '44.44';
+            updateRatioTitle();
             document.getElementById('includeElectrolytes').checked = false;
             document.getElementById('includeCaffeine').checked = false;
             document.getElementById('electrolyteMethodSection').style.display = 'none';
@@ -847,11 +882,11 @@
                 'Home made sports gel calculator based on the recipe Jon Albon used when he won CCC in 2023 with a glucose to fructose ratio of <strong>1.25:1</strong>';
         });
         
-            // Settings form submission
+        // Settings form submission
         document.getElementById('settingsForm').addEventListener('submit', function(event) {
             event.preventDefault();
             const glucosePercent = parseFloat(document.getElementById('glucosePercent').value);
-            const fructosePercent = 100 - glucosePercent;
+            const fructosePercent = parseFloat(document.getElementById('fructosePercent').value);
             includeElectrolytes = document.getElementById('includeElectrolytes').checked;
             includeCaffeine = document.getElementById('includeCaffeine').checked;
             const sodium = parseInt(document.getElementById('sodiumMg').value) || 0;
@@ -1111,6 +1146,7 @@
             detectLocation();
             loadSettings();
             populateShoppingSection();
+            updateRatioTitle();
             
             // Country select dropdown (top right)
             document.getElementById('countrySelect').addEventListener('change', function() {
